@@ -4,32 +4,37 @@
 (function ($) {
     "use strict";
 
-/*-------------------------------------------------------------------------------------------------------
-  Globale variables for displaying weekday shortcuts and temperature units for Celsius and Fahrenheit
- -------------------------------------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------------------------------------
+        Globale variables for displaying weekday shortcuts and temperature units for Celsius and Fahrenheit
+     -------------------------------------------------------------------------------------------------------*/
 
     var WEEKDAYS_EN = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
         WEEKDAYS_DE = ['SON', 'MON', 'DIE', 'MIT', 'DON', 'FRE', 'SAM'],
         WEEKDAYS_EN_SHORT = ['S', 'M', 'TU', 'W', 'TH', 'F', 'ST'],
         WEEKDAYS_DE_SHORT = ['S', 'M', 'DI', 'MI', 'DO', 'F', 'SA'],
-        TEMP_UNITS = ['°C', '°F', 'h'];
+        TEMP_UNITS = ['°C', '°F', 'h'],
+        NEW_TEMP;
 
-/*-------------------------------------------------------------------------------------------------------
-   Start Widget
---------------------------------------------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------------------------------------------
+        Start Widget
+    --------------------------------------------------------------------------------------------------------*/
 
     $.widget("custom.temperatur", {
         options: {
             temp: 18,
+            // weekday = 'en' or 'de'
             weekdays: 'en',
+            // scalewidth must be of type int
             scalewidth: 6,
+            // tempUnit = 'Celsius' or 'Fahrenheit depending on the temperature unit from temp'
             tempUnit: 'Celsius',
+            // timeActive = 'no' or 'yes': If timeActive = 'yes' time is shown initially when starting widget
             timeActive: 'yes'
         },
 
-/*------------------------------------------------------------------------------------------------------
-   Request on time server to retrieve date string in jsonp format with callback handling
-------------------------------------------------------------------------------------------------------*/
+        /*------------------------------------------------------------------------------------------------------
+            Request on time server to retrieve date string in jsonp format with callback handling
+        ------------------------------------------------------------------------------------------------------*/
 
         getTimeFromServer: function (cb) {
             return $.ajax({
@@ -49,9 +54,9 @@
 
         },
 
-/*------------------------------------------------------------------------------------------------------
-   JQuery-selectors for DOM elements to be used in widget
-------------------------------------------------------------------------------------------------------*/
+        /*------------------------------------------------------------------------------------------------------
+            JQuery-selectors for DOM elements to be used in widget
+        ------------------------------------------------------------------------------------------------------*/
 
         dom: {
             $clock: $('<div id="clock" class="light"/>'),
@@ -67,9 +72,9 @@
             $tachoDiv: $('<div class="tacho"/>'),
             $tachometer: $('<i class="fa fa-tachometer"/>')
         },
-/*-----------------------------------------------------------------------------------------------------
-   Adding DOM elements for building the widget plus function calls
------------------------------------------------------------------------------------------------------*/
+        /*-----------------------------------------------------------------------------------------------------
+            Adding DOM elements for building the widget plus function calls
+        -----------------------------------------------------------------------------------------------------*/
 
         _create: function () {
             var self = this,
@@ -77,10 +82,11 @@
                 $fullTempChangeDiv = self.dom.$tempChangeButton.append(self.dom.$tempUnits, self.dom.$tachoDiv.append(self.dom.$tachometer)),
                 $realDisplay = self.dom.$display.append(self.dom.$weekdays, $fullButtonDiv, self.dom.$digitsTime, self.dom.$digitsCelsius, self.dom.$digitsFahrenheit, $fullTempChangeDiv);
 
+            // Full DOM block variable for digital display
             $realDisplay = self.dom.$clock.append($realDisplay);
 
             self.element.append($realDisplay);
-
+            // Array of digits' name
             self.digit_to_name = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'minus'];
             self.digitsC = {};
             self.digitsF = {};
@@ -88,8 +94,9 @@
             self.calculate_temp();
             self.ExecuteFunc();
         },
-
-
+        /*-----------------------------------------------------------------------------------------------------
+            Building display vy assigning digit classes to numbers
+        -----------------------------------------------------------------------------------------------------*/
         _builddisplay: function () {
 
             var self = this,
@@ -124,27 +131,33 @@
                     self.dom.$digitsFahrenheit.append(posF);
                     self.dom.$digitsTime.append(posTime);
                 }
-
             });
-
         },
-
+        /*---------------------------------------------------------------------------------------------------
+            Check for correct options settings to run the widget
+        ---------------------------------------------------------------------------------------------------*/
         checkOptionsInput: function () {
             var self = this;
             if (!(self.options.tempUnit === 'Celsius' || self.options.tempUnit === 'Fahrenheit')) {
+                self.options.tempUnit = 'Celsius';
                 console.log("FOOL!! Don't you know how to type 'Celsius' or 'Fahrenheit'??");
             }
 
             if (!(self.options.timeActive === 'yes' || self.options.timeActive === 'no')) {
+                self.options.timeActive = 'yes';
                 console.log("FOOL!! Don't you know how to type 'yes' or 'no'??");
             }
 
             if (!(self.options.weekdays === 'en' || self.options.weekdays === 'de')) {
+                self.options.weekdays = 'de';
                 console.log("FOOL!! Don't you know how to type 'en' or 'de'??");
             }
         },
 
-
+/*-----------------------------------------------------------------------------------------------------
+    Executing all functions and converting options settings to display to decide to show either time or
+    temperature display
+------------------------------------------------------------------------------------------------------*/
         ExecuteFunc: function () {
             var self = this;
 
@@ -183,6 +196,9 @@
             self.update_temp();
         },
 
+/*--------------------------------------------------------------------------------------------------------
+    Button action to change between temperature in Celsius and Fahreneheit
+---------------------------------------------------------------------------------------------------------*/
 
         ClickTempToggle: function () {
             var buttonWrapper,
@@ -208,7 +224,9 @@
                 }
             });
         },
-
+/*--------------------------------------------------------------------------------------------------------
+    Button action to change between time and temperature display
+---------------------------------------------------------------------------------------------------------*/
 
         ClickTimeTempToggle: function () {
             var buttonWrapper,
@@ -245,15 +263,22 @@
             });
         },
 
+/*------------------------------------------------------------------------------------------------------
+    Bind temperature value from outside server to DOM display and convert it into 7 segment digits
+------------------------------------------------------------------------------------------------------*/
+
         update_temp: function () {
             var self = this,
                 strC = parseFloat(self.options.temp).toFixed(2),
                 strCString = strC.toString(),
-                strF = parseFloat(self.newTemp).toFixed(2),
+                strF = parseFloat(NEW_TEMP).toFixed(2),
                 strFString = strF.toString(),
                 nullString = ' ',
                 zeroString = '0';
 
+            /* Function to handle the retrieved temp string to bind the retrieved digits from the string
+               correctly to the individual digit divs of the display. Notice that three characters or
+               digits are needed before the decimal point and two ones after it*/
             function handleTempStringLength(tempString, digitObject, temp) {
                 var tempNumberTable;
 
@@ -274,7 +299,7 @@
 
                 tempNumberTable = tempString;
 
-                if (temp < 0) {
+                if (temp < 0 || NEW_TEMP < 0) {
                     digitObject.i1.attr('class', self.digit_to_name[10]);
                 } else {
                     digitObject.i1.attr('class', self.digit_to_name[tempNumberTable[0]]);
@@ -287,7 +312,7 @@
             }
 
             handleTempStringLength(strCString, self.digitsC, self.options.temp);
-            handleTempStringLength(strFString, self.digitsF, self.newtemp);
+            handleTempStringLength(strFString, self.digitsF, NEW_TEMP);
 
             if (self.options.timeActive === 'no') {
 
@@ -301,6 +326,11 @@
                 $("#tempunits").text(TEMP_UNITS[2]);
             }
         },
+
+/*-----------------------------------------------------------------------------------------------------
+    Converting date string from server to time numbers and binding them to the DOM display and
+    converting to 7 segment digits
+-----------------------------------------------------------------------------------------------------*/
 
         digitizeTime: function (time) {
             var self = this,
@@ -331,13 +361,15 @@
 
             var TimeNumberTable = strTimeString;
 
-
             self.digitsTime.i1.attr('class', self.digit_to_name[TimeNumberTable[0]]);
             self.digitsTime.i2.attr('class', self.digit_to_name[TimeNumberTable[1]]);
             self.digitsTime.i3.attr('class', self.digit_to_name[TimeNumberTable[2]]);
             self.digitsTime.d1.attr('class', self.digit_to_name[TimeNumberTable[4]]);
             self.digitsTime.d2.attr('class', self.digit_to_name[TimeNumberTable[5]]);
         },
+/*----------------------------------------------------------------------------------------------------
+    Retrieving time from server via callback function and handling updating it per second internally
+-----------------------------------------------------------------------------------------------------*/
 
         update_time_from_server: function () {
             var self = this,
@@ -346,37 +378,38 @@
             self.getTimeFromServer(function (dates) {
                 timems = Date.parse(dates);
                 console.log('handleData', timems);
-
+                //timems variable is added 1000ms per second
                 setInterval(function () {
                     timems += 1000;
                     return timems;
                 }, 1000);
-
+                //added timems variable used for update the display per second
                 setInterval(function () {
                     return self.digitizeTime(timems);
                 }, 1000);
-
             });
-
             //setTimeout(self.update_time_from_server.bind(self), 300000);
-
         },
 
-
+/*----------------------------------------------------------------------------------------------------
+    Converting the temperature in the other temperature unit format
+----------------------------------------------------------------------------------------------------*/
 
         calculate_temp: function () {
             var self = this;
 
             if (self.options.tempUnit === 'Celsius') {
-                self.newTemp = 9 / 5 * self.options.temp + 32;
-                console.log(self.newTemp);
+                NEW_TEMP = 9 / 5 * self.options.temp + 32;
+                console.log(NEW_TEMP);
             } else if (self.options.tempUnit === 'Fahrenheit') {
-                self.newTemp = (self.options.temp - 32) * 5 / 9;
-                console.log(self.newTemp);
+                NEW_TEMP = (self.options.temp - 32) * 5 / 9;
+                console.log(NEW_TEMP);
             }
         },
 
-
+/*--------------------------------------------------------------------------------------------------
+    bind the weekdays to the DOM display
+--------------------------------------------------------------------------------------------------*/
 
         update_weekdays: function () {
             var self = this,
@@ -411,10 +444,6 @@
             self.weekdays = self.dom.$clock.find('.weekdays span');
 
             self.weekdays.removeClass('active').eq(currentDay).addClass('active');
-
         }
-
     });
-
-
 }(jQuery));
