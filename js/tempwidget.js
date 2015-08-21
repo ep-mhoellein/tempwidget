@@ -4,13 +4,19 @@
 (function ($) {
     "use strict";
 
+/*-------------------------------------------------------------------------------------------------------
+  Globale variables for displaying weekday shortcuts and temperature units for Celsius and Fahrenheit
+ -------------------------------------------------------------------------------------------------------*/
+
     var WEEKDAYS_EN = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
         WEEKDAYS_DE = ['SON', 'MON', 'DIE', 'MIT', 'DON', 'FRE', 'SAM'],
         WEEKDAYS_EN_SHORT = ['S', 'M', 'TU', 'W', 'TH', 'F', 'ST'],
         WEEKDAYS_DE_SHORT = ['S', 'M', 'DI', 'MI', 'DO', 'F', 'SA'],
         TEMP_UNITS = ['°C', '°F', 'h'];
 
-
+/*-------------------------------------------------------------------------------------------------------
+   Start Widget
+--------------------------------------------------------------------------------------------------------*/
 
     $.widget("custom.temperatur", {
         options: {
@@ -21,7 +27,9 @@
             timeActive: 'yes'
         },
 
-
+/*------------------------------------------------------------------------------------------------------
+   Request on time server to retrieve date string in jsonp format with callback handling
+------------------------------------------------------------------------------------------------------*/
 
         getTimeFromServer: function (cb) {
             return $.ajax({
@@ -41,7 +49,27 @@
 
         },
 
+/*------------------------------------------------------------------------------------------------------
+   JQuery-selectors for DOM elements to be used in widget
+------------------------------------------------------------------------------------------------------*/
 
+        dom: {
+            $clock: $('<div id="clock" class="light"/>'),
+            $display: $('<div class="display"/>'),
+            $weekdays: $('<div class="weekdays"/>'),
+            $buttonIcons: $('<div id="buttonicons">'),
+            $hourglass: $('<i class="fa fa-hourglass extra"/>'),
+            $digitsTime: $('<div class="digits digitsTime"/>'),
+            $digitsCelsius: $('<div class="digits digitsC"/>'),
+            $digitsFahrenheit: $('<div class="digits digitsF"/>'),
+            $tempChangeButton: $('<div id="tempumschalt"/>'),
+            $tempUnits: $('<div id="tempunits"/>'),
+            $tachoDiv: $('<div class="tacho"/>'),
+            $tachometer: $('<i class="fa fa-tachometer"/>')
+        },
+/*-----------------------------------------------------------------------------------------------------
+   Adding DOM elements for building the widget plus function calls
+-----------------------------------------------------------------------------------------------------*/
 
         _create: function () {
             var self = this,
@@ -59,22 +87,6 @@
             self.digitsTime = {};
             self.calculate_temp();
             self.ExecuteFunc();
-        },
-
-
-        dom: {
-            $clock: $('<div id="clock" class="light"/>'),
-            $display: $('<div class="display"/>'),
-            $weekdays: $('<div class="weekdays"/>'),
-            $buttonIcons: $('<div id="buttonicons">'),
-            $hourglass: $('<i class="fa fa-hourglass extra"/>'),
-            $digitsTime: $('<div class="digits digitsTime"/>'),
-            $digitsCelsius: $('<div class="digits digitsC"/>'),
-            $digitsFahrenheit: $('<div class="digits digitsF"/>'),
-            $tempChangeButton: $('<div id="tempumschalt"/>'),
-            $tempUnits: $('<div id="tempunits"/>'),
-            $tachoDiv: $('<div class="tacho"/>'),
-            $tachometer: $('<i class="fa fa-tachometer"/>')
         },
 
 
@@ -105,11 +117,9 @@
 
                     }
                     // Set the digits as key:value pairs in the digits object
-                    self.digitsC[this] = posC;
-                    self.digitsF[this] = posF;
-                    self.digitsTime[this] = posTime;
-
-                    // Add the digit elements to the page
+                    self.digitsC[value] = posC;
+                    self.digitsF[value] = posF;
+                    self.digitsTime[value] = posTime;
                     self.dom.$digitsCelsius.append(posC);
                     self.dom.$digitsFahrenheit.append(posF);
                     self.dom.$digitsTime.append(posTime);
@@ -137,6 +147,7 @@
 
         ExecuteFunc: function () {
             var self = this;
+
             self.checkOptionsInput();
             self._builddisplay();
             self.update_weekdays();
@@ -195,10 +206,7 @@
 
                     console.log(self.options);
                 }
-
-
             });
-
         },
 
 
@@ -234,9 +242,7 @@
 
                     console.log(self.options);
                 }
-
             });
-
         },
 
         update_temp: function () {
@@ -273,6 +279,7 @@
                 } else {
                     digitObject.i1.attr('class', self.digit_to_name[tempNumberTable[0]]);
                 }
+
                 digitObject.i2.attr('class', self.digit_to_name[tempNumberTable[1]]);
                 digitObject.i3.attr('class', self.digit_to_name[tempNumberTable[2]]);
                 digitObject.d1.attr('class', self.digit_to_name[tempNumberTable[4]]);
@@ -285,7 +292,6 @@
             if (self.options.timeActive === 'no') {
 
                 if (self.options.tempUnit === 'Celsius') {
-
                     $("#tempunits").text(TEMP_UNITS[0]);
                 } else if (self.options.tempUnit === 'Fahrenheit') {
                     $("#tempunits").text(TEMP_UNITS[1]);
@@ -294,8 +300,6 @@
             } else if (self.options.timeActive === 'yes') {
                 $("#tempunits").text(TEMP_UNITS[2]);
             }
-
-
         },
 
         digitizeTime: function (time) {
@@ -307,7 +311,6 @@
                 zeroString = '0',
                 strTimeString;
 
-
             if (hourString.length === 1) {
                 hourString = nullString.concat(nullString.concat(hourString));
             } else if (hourString.length === 0) {
@@ -315,8 +318,6 @@
             } else if (hourString.length === 2) {
                 hourString = nullString.concat(hourString);
             }
-
-
 
             if (minuteString.length === 0) {
                 minuteString = zeroString.concat(zeroString.concat(minuteString));
@@ -336,8 +337,6 @@
             self.digitsTime.i3.attr('class', self.digit_to_name[TimeNumberTable[2]]);
             self.digitsTime.d1.attr('class', self.digit_to_name[TimeNumberTable[4]]);
             self.digitsTime.d2.attr('class', self.digit_to_name[TimeNumberTable[5]]);
-
-
         },
 
         update_time_from_server: function () {
