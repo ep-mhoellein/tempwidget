@@ -1,0 +1,400 @@
+@w: 10px;
+@height: 1/4 * @w;
+@digit-margin: 1/2* @w;
+@innerDisplayColor: #dddddd;
+@outerDisplayColor: #fafafa;
+@iconHoverColor: #48D1CC;
+
+
+#clock {
+	width: 27* @w;
+	padding:3 * @w;
+	/*margin:50px auto 60px;*/
+	position:relative;
+
+	.digitsC{
+		display: none;
+	}
+
+	.digitsF{
+		display: none;
+	}
+
+	&.light{
+		background-color:#f3f3f3;
+		color:#272e38;
+
+		&.after{
+			box-shadow:0 4px 10px rgba(0,0,0,0.15);
+		}
+
+		.display{
+			background-color:@innerDisplayColor;
+			box-shadow:0 1px 1px rgba(0,0,0,0.08) inset, 0 1px 1px @outerDisplayColor;
+			text-align:center;
+			padding: (4* @w)  (2* @w ) (6* @w);
+			border-radius:6px;
+			position:relative;
+		}
+
+		.digits{
+			div{
+            	float:left;
+				text-align:left;
+				position:relative;
+				width: 2* @w;
+				height: 2* @w + 7/4* @w;
+				display:inline-block;
+				margin:0 @digit-margin;
+
+			&.dots{
+			&:before,&:after{
+				background-color:#272e38;
+			}
+			}
+				span{
+					background-color:#272e38;	
+					border-color:#272e38;
+					opacity:0;
+					position:absolute;
+	                -webkit-transition:0.25s;
+					-moz-transition:0.25s;
+					transition:0.25s;	
+				}
+			}
+		}
+	}
+
+	.tacho{
+		line-height: 0px;
+	}
+
+	.weekdays{
+    	font-size: 1.2* @w ;
+		font-family: 'Orbitron', sans-serif;
+		font-weight: bold;
+		position:absolute;
+		width:100%;
+		top:10px;
+		left:0;
+		text-align:center;
+
+		span{
+			opacity:0.2;
+			padding:0 (0.55* @w);
+
+			
+		}
+	}
+}
+
+
+#clock .weekdays span.active{
+	opacity:1;
+}
+
+/*-------------------------
+	Temperature units
+--------------------------*/
+
+
+
+#tempunits{
+	font-size: 2.5* @w;
+	width: 2.6* @w;
+	height: 2.2* @w;
+	line-height: 1.7* @w;
+}
+
+#tempumschalt{
+    float: left;
+    display: block;
+	width: 2.6* @w;
+	height: 2.2* @w;
+}
+
+.fa {
+	font-size: 1.7* @w;
+	padding: 0  0.8* @w;
+}
+
+ #buttonicons{
+	float: left;
+	font-size: 2.5* @w;
+	width: 2.6* @w;
+	height: 2.2* @w;
+	line-height: 1.7* @w;
+}
+
+#buttonicons:hover{
+	color: @iconHoverColor;
+	cursor: pointer;
+}
+
+.tacho:hover{
+	color: @iconHoverColor;
+	cursor: pointer;
+}
+
+
+
+
+
+/*-------------------------
+	The Digits
+--------------------------*/
+
+.points {
+	content:'';
+	position:absolute;
+	width:0;
+	height:0;
+	border: 1/4 * @w solid transparent;
+}
+
+#clock{
+	.digits{
+		.d1{
+			height: 1/4* @w;
+			width:@w;
+			top:0;
+			left: 1/2* @w;
+
+			&:before{
+				border-width:0 (1/4* @w) (1/4 * @w) 0;
+				border-right-color:inherit;
+				left: -1/4 * @w + 1/16* @w;
+			}
+			&:after{
+				border-width:0 0 (1/4* @w) (1/4* @w);
+				border-left-color:inherit;
+				left: @w;
+			}
+		}
+		.d2{
+			height: 1/4 * @w;
+			width: @w;
+			top: 3/4* @w + @w;
+			left: 1/2 * @w;
+
+			&:before{
+				width: 0;
+   				height: 0;	
+				border-right: 1/4 * @w;
+				border-top: 1/8 * @w solid transparent;
+				border-bottom: 1/8 * @w solid transparent;
+				border-left-color:inherit;
+				left: @w;
+			}
+			&:after{
+				width: 0;
+    			height: 0;	
+				border-left: 1/4 * @w;
+				border-top: 1/8 * @w solid transparent;
+				border-bottom: 1/8 * @w solid transparent;
+				border-right-color:inherit;
+				left:-1/4 * @w + 1/32 * @w;
+			}
+		}
+		div{
+			span{
+			&:before,&:after{
+				.points
+			}
+			}
+		}
+	}
+}
+
+#clock .digits .d3{
+			height: 1/4 * @w;
+			width: @w;
+			top: 6/4* @w + 2* @w;
+			left: 1/2* @w;
+		}
+#clock .digits .d3:before{	
+	border-width:(1/4 * @w) (1/4 * @w) 0 0;
+	border-right-color:inherit;
+	left:-1/4 * @w + 1/16 * @w;
+}
+#clock .digits .d3:after{	
+	border-width:(1/4 * @w) 0 0 (1/4 * @w);
+	border-left-color:inherit;
+	left: @w;
+}
+
+#clock .digits .d4{
+	width: 1/4 * @w;
+	height: @w;
+	top: 1/2 * @w;
+	left:0;
+}
+#clock .digits .d4:before{	
+	border-width:0 (1/4 * @w) (1/4 * @w) 0;
+	border-bottom-color:inherit;
+	top:-1* (1/4 * @w - 1/8 * @w);
+}
+#clock .digits .d4:after{	
+	border-width:0 0 (1/4 * @w) (1/4 * @w);
+	border-left-color:inherit;
+	bottom:-1* (1/4 * @w - 1/32 * @w);
+}
+
+#clock .digits .d5{			
+	width: 1/4* @w;
+	height:@w;
+	top: 1/2 * @w;
+	left: 3/4 *@w + @w;
+}
+#clock .digits .d5:before{	
+	border-width:0 0 (1/4 * @w) (1/4 * @w);
+	border-bottom-color:inherit;
+	top:-1* (1/4 * @w - 1/8 * @w);
+}
+#clock .digits .d5:after{	
+	border-width:(1/4 * @w) 0 0 (1/4 * @w);
+	border-top-color:inherit;
+	bottom:-1* (1/4 * @w - 1/32 * @w);
+}
+
+#clock .digits .d6{			
+	width: 1/4 * @w;
+	height: @w;
+	top: 5/4* @w + @w;
+	left: 0;
+}
+#clock .digits .d6:before{
+      border-width:0 (1/4 * @w) (1/4 * @w) 0;
+      border-bottom-color:inherit;
+      top:-1* (1/4 * @w - 1/8 * @w);
+  }
+#clock .digits .d6:after{	
+	border-width:0 0 (1/4 * @w) (1/4 * @w);
+	border-left-color:inherit;
+	bottom:-1* (1/4 * @w - 1/32 * @w);
+}
+
+#clock .digits .d7{			
+	width: 1/4* @w;
+	height: @w;
+	top: 5/4* @w + @w;
+	left: 3/4* @w + @w;
+}
+#clock .digits .d7:before{	
+	border-width:0 0 (1/4 * @w) (1/4 * @w);
+	border-bottom-color:inherit;
+	top:-1* (1/4 * @w - 1/8 * @w);
+}
+#clock .digits .d7:after{	
+	border-width:(1/4 * @w) 0 0 (1/4 * @w);
+	border-top-color:inherit;
+	bottom:-1*(1/4 * @w - 1/32 * @w);
+}
+
+/* Digits */
+
+#clock{
+	.digits{
+		div{
+		&.minus{
+			.d2{
+				opacity:1;
+			}
+		}
+		&.one{
+			.d5,.d7{
+				opacity:1;
+			}
+		}
+		&.two{
+			.d1,.d5,.d2,.d6,.d3{
+				opacity:1;
+			}
+		}
+		&.three{
+			.d1,.d5,.d2,.d7,.d3{
+				opacity:1;
+			}
+		}
+		&.four{
+			.d5,.d2,.d4,.d7{
+				opacity:1;
+			}
+		}
+		&.five{
+			.d1,.d2,.d4,.d3,.d7{
+				opacity:1;
+			}
+		}
+		&.six{
+			.d1,.d2,.d4,.d3,.d6,.d7{
+				opacity:1;
+			}
+		}
+		&.seven{
+			.d1,.d5,.d7{
+				opacity:1;
+			}
+		}
+		&.eight{
+			.d1,.d2,.d3,.d4,.d5,.d6,.d7{
+				opacity:1;
+			}
+		}
+		&.nine{
+			.d1,.d2,.d3,.d4,.d5,.d7{
+				opacity:1;
+			}
+		}
+		&.zero {
+			.d1,.d3,.d4,.d5,.d6,.d7{
+				opacity:1;
+			}
+		}
+		}
+	}
+}
+
+
+/* The dots */
+
+.dotdesign{
+	width: 1/2*  @w;
+	height: 1/2* @w;
+	background-color:#272e38;
+	-moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+	content:'';
+	position:absolute;
+}
+
+#clock{
+	.digits{
+		div{
+		&.dots{
+			width: @w;
+		&:after{
+			.dotdesign;
+			top: 5/4* @w + 2* @w;
+		}	
+		}
+		&.doubledots{
+			width: @w;
+		&:before,&:after{
+			.dotdesign;
+			top: 2.5*  @w;
+		}	
+		}
+		}
+	}
+}
+
+
+#clock .digits div.doubledots:after{
+	top: 1* @w;
+}
+
+#clock .digitsTime{
+	display: none;
+}
