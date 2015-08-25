@@ -68,10 +68,11 @@
   opacity: 1;
 }
 /*-------------------------
-	Temperature units
+    Temperature units
 --------------------------*/
 #tempunits {
   font-size: 25px;
+  font-family: 'Orbitron', sans-serif;
   width: 26px;
   height: 22px;
   line-height: 17px;
@@ -102,7 +103,7 @@
   cursor: pointer;
 }
 /*-------------------------
-	The Digits
+    The Digits
 --------------------------*/
 .points {
   content: '';

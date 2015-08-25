@@ -20,6 +20,8 @@
     --------------------------------------------------------------------------------------------------------*/
 
     $.widget("custom.temperatur", {
+        // hTimer: undefined,
+
         options: {
             temp: 18,
             // weekday = 'en' or 'de'
@@ -31,6 +33,8 @@
             // timeActive = 'no' or 'yes': If timeActive = 'yes' time is shown initially when starting widget
             timeActive: 'yes'
         },
+
+        resync: 15*60*1000,  // minutes * seconds * 1000
 
         /*------------------------------------------------------------------------------------------------------
             Request on time server to retrieve date string in jsonp format with callback handling
@@ -59,6 +63,10 @@
         ------------------------------------------------------------------------------------------------------*/
 
         dom: {
+            // REVIEW: es sollten hier keine IDs verwendet werden
+            // GRUND: das Widget kann nur noch ein einziges Mal innerhalb eines Dokumentes verwendet werden,
+            //        da IDs eindeutig sein müssen - besser über Klassen lösen.
+            // BESSER: template engine wie z.B. mustach verwenden, um das HTML-Fragment zu generieren
             $clock: $('<div id="clock" class="light"/>'),
             $display: $('<div class="display"/>'),
             $weekdays: $('<div class="weekdays"/>'),
@@ -97,6 +105,7 @@
         /*-----------------------------------------------------------------------------------------------------
             Building display vy assigning digit classes to numbers
         -----------------------------------------------------------------------------------------------------*/
+        // REVIEW: für Methoden-Namen Camel-Case-Schreibweise verwenden (z.B. _buildDisplay)
         _builddisplay: function () {
 
             var self = this,
@@ -108,10 +117,7 @@
                     self.dom.$digitsCelsius.append('<div class="dots"/>');
                     self.dom.$digitsFahrenheit.append('<div class="dots"/>');
                     self.dom.$digitsTime.append('<div class="doubledots"/>');
-
-
                 } else {
-
                     var posC = $('<div>'),
                         posF = $('<div>'),
                         posTime = $('<div>'),
@@ -123,6 +129,7 @@
                         posTime.append('<span class="d' + i + '">');
 
                     }
+
                     // Set the digits as key:value pairs in the digits object
                     self.digitsC[value] = posC;
                     self.digitsF[value] = posF;
@@ -158,6 +165,9 @@
     Executing all functions and converting options settings to display to decide to show either time or
     temperature display
 ------------------------------------------------------------------------------------------------------*/
+        // REVIEW: Methoden-Namen bitte mit Kleinbuchstaben beginnen
+        //         Ist das eine Methode, die von aussen verfügbar sein soll? Anstonsten bitte als private Methode deklarieren
+        //         (Bitte auch für andere Methoden beachten)
         ExecuteFunc: function () {
             var self = this;
 
@@ -189,7 +199,8 @@
                 self.dom.$digitsFahrenheit.css("display", 'none');
                 self.dom.$digitsTime.css("display", 'block');
                 self.dom.$tempUnits.text(TEMP_UNITS[2]);
-                $('#tempumschalt .fa-tachometer').removeClass('fa-tachometer');
+                // REVIEW: Besser bereits existierende Referenz verwenden
+                self.dom.$tempChangeButton.find('.fa-tachometer').removeClass('fa-tachometer');
             }
 
             self.update_time_from_server();
@@ -201,12 +212,10 @@
 ---------------------------------------------------------------------------------------------------------*/
 
         ClickTempToggle: function () {
-            var buttonWrapper,
-                self = this;
+            var self = this;
 
-            buttonWrapper = $('i.fa-tachometer');
-
-            buttonWrapper.on('click', function (evt) {
+            // REVIEW: hier ist es performanter, die Referenz zu verwenden, die bereits existiert
+            self.dom.$tachometer.on('click', function (evt) {
                 if (evt.type === 'click') {
                     if (self.dom.$digitsCelsius.css("display") === 'block') {
                         self.dom.$digitsCelsius.css("display", 'none');
@@ -229,12 +238,10 @@
 ---------------------------------------------------------------------------------------------------------*/
 
         ClickTimeTempToggle: function () {
-            var buttonWrapper,
-                self = this;
+            var self = this;
 
-            buttonWrapper = $('i.fa-hourglass');
-
-            buttonWrapper.on('click', function (evt) {
+            // REVIEW: hier ist es performanter, die Referenz zu verwenden, die bereits existiert
+            self.dom.$hourglass.on('click', function (evt) {
                 if (evt.type === 'click') {
                     if (self.options.timeActive === 'no') {
                         self.dom.$digitsCelsius.css("display", 'none');
@@ -243,7 +250,8 @@
 
                         self.dom.$tempUnits.text(TEMP_UNITS[2]);
                         self.options.timeActive = 'yes';
-                        $('#tempumschalt .fa-tachometer').removeClass('fa-tachometer');
+                        // REVIEW: Auch hier besser die Referenz verwenden
+                        self.dom.$tachometer.removeClass('fa-tachometer');
                         self.dom.$hourglass.removeClass('fa-hourglass');
                         self.dom.$hourglass.addClass('fa-sun-o');
                     } else {
@@ -253,7 +261,8 @@
                         self.dom.$tempUnits.text(TEMP_UNITS[0]);
                         self.options.timeActive = 'no';
                         self.options.tempUnit = 'Celsius';
-                        $('#tempumschalt .fa').addClass('fa-tachometer');
+                        // REVIEW: Auch hier besser die Referenz verwenden
+                        self.dom.$tachometer.addClass('fa-tachometer');
                         self.dom.$hourglass.removeClass('fa-sun-o');
                         self.dom.$hourglass.addClass('fa-hourglass');
                     }
@@ -315,15 +324,16 @@
             handleTempStringLength(strFString, self.digitsF, NEW_TEMP);
 
             if (self.options.timeActive === 'no') {
-
                 if (self.options.tempUnit === 'Celsius') {
-                    $("#tempunits").text(TEMP_UNITS[0]);
+                    // REVIEW: Auch hier besser die Referenz verwenden
+                    self.dom.$tempUnits.text(TEMP_UNITS[0]);
                 } else if (self.options.tempUnit === 'Fahrenheit') {
-                    $("#tempunits").text(TEMP_UNITS[1]);
+                    // REVIEW: Auch hier besser die Referenz verwenden
+                    self.dom.$tempUnits.text(TEMP_UNITS[1]);
                 }
-
             } else if (self.options.timeActive === 'yes') {
-                $("#tempunits").text(TEMP_UNITS[2]);
+                // REVIEW: Auch hier besser die Referenz verwenden
+                self.dom.$tempUnits.text(TEMP_UNITS[2]);
             }
         },
 
@@ -359,6 +369,7 @@
 
             strTimeString = hourString + ':' + minuteString;
 
+            // REVIEW: Variablen nach Möglichkeit bitten am Anfang deklarieren; hier nur noch Wert zuweisen
             var TimeNumberTable = strTimeString;
 
             self.digitsTime.i1.attr('class', self.digit_to_name[TimeNumberTable[0]]);
@@ -376,19 +387,42 @@
                 timems;
 
             self.getTimeFromServer(function (dates) {
+                // REVIEW: Den Zeitserver nicht jede Sekunde abfragen.
+                // BESSER: Sekunden intern inkrementieren und nach einem Delay Zeitserver zum
+                //         Synchronisieren erneut anfragen (siehe _updateTime)
+
+                // parse milliseconds from response
                 timems = Date.parse(dates);
-                console.log('handleData', timems);
-                //timems variable is added 1000ms per second
-                setInterval(function () {
-                    timems += 1000;
-                    return timems;
-                }, 1000);
-                //added timems variable used for update the display per second
-                setInterval(function () {
-                    return self.digitizeTime(timems);
-                }, 1000);
+                // calculate time when to re-synchronize with time server
+                self.timeEnd = timems + self.resync;
+
+                // call method to count seconds
+                self._updateTime(self, timems);
             });
-            //setTimeout(self.update_time_from_server.bind(self), 300000);
+        },
+
+/*----------------------------------------------------------------------------------------------------
+    Call render method and update time.
+    Re-synchronize with time server after resync-delay.
+-----------------------------------------------------------------------------------------------------*/
+        _updateTime: function (_self, time) {
+            // print time
+            _self.digitizeTime(time);
+
+            // increase time by a second
+            time+= 1000;
+
+            // re-synchronize with time server after self.resynch minutes
+            if (_self.timeEnd - time < 1000) {
+                window.clearTimeout(_self.hTimer);
+                _self.update_time_from_server();
+            } else {
+                // call method to count seconds after one second
+                _self.hTimer = window.setTimeout(function () {
+                    _self._updateTime(_self, time);
+                }, 1000);
+            }
+
         },
 
 /*----------------------------------------------------------------------------------------------------
